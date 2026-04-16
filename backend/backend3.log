@@ -1,0 +1,82 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.ai:ai-assistant >-------------------------
+[INFO] Building AI Assistant 1.0.0
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot-maven-plugin:3.4.1:run (default-cli) > test-compile @ ai-assistant >>>
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ai-assistant ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ai-assistant ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ai-assistant ---
+[INFO] skip non existing resourceDirectory E:\java\AI\20260416\backend\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ai-assistant ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot-maven-plugin:3.4.1:run (default-cli) < test-compile @ ai-assistant <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.4.1:run (default-cli) @ ai-assistant ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.1)
+
+2026-04-16T23:34:20.142+08:00  INFO 6164 --- [ai-assistant] [           main] c.ai.assistant.AiAssistantApplication    : Starting AiAssistantApplication using Java 17.0.15 with PID 6164 (E:\java\AI\20260416\backend\target\classes started by dxnyu in E:\java\AI\20260416\backend)
+2026-04-16T23:34:20.145+08:00 DEBUG 6164 --- [ai-assistant] [           main] c.ai.assistant.AiAssistantApplication    : Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-04-16T23:34:20.146+08:00  INFO 6164 --- [ai-assistant] [           main] c.ai.assistant.AiAssistantApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-04-16T23:34:23.232+08:00  INFO 6164 --- [ai-assistant] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-16T23:34:23.350+08:00  INFO 6164 --- [ai-assistant] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-16T23:34:23.351+08:00  INFO 6164 --- [ai-assistant] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-04-16T23:34:23.601+08:00  INFO 6164 --- [ai-assistant] [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-04-16T23:34:23.602+08:00  INFO 6164 --- [ai-assistant] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3045 ms
+2026-04-16T23:34:25.567+08:00 DEBUG 6164 --- [ai-assistant] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : 7 mappings in 'requestMappingHandlerMapping'
+2026-04-16T23:34:25.628+08:00 DEBUG 6164 --- [ai-assistant] [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2026-04-16T23:34:25.799+08:00 DEBUG 6164 --- [ai-assistant] [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-04-16T23:34:25.883+08:00 DEBUG 6164 --- [ai-assistant] [           main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-04-16T23:34:26.241+08:00  INFO 6164 --- [ai-assistant] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-04-16T23:34:26.259+08:00  INFO 6164 --- [ai-assistant] [           main] c.ai.assistant.AiAssistantApplication    : Started AiAssistantApplication in 6.99 seconds (process running for 7.743)
+2026-04-16T23:34:41.917+08:00  INFO 6164 --- [ai-assistant] [nio-8080-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-16T23:34:41.917+08:00  INFO 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-16T23:34:41.917+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2026-04-16T23:34:41.917+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2026-04-16T23:34:41.917+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2026-04-16T23:34:41.918+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@27e17ef0
+2026-04-16T23:34:41.919+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@b4d92cd
+2026-04-16T23:34:41.919+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-04-16T23:34:41.919+08:00  INFO 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-04-16T23:34:41.932+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/chat/health", parameters={}
+2026-04-16T23:34:41.949+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.ai.assistant.controller.ChatController#health()
+2026-04-16T23:34:42.052+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-04-16T23:34:42.054+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] m.m.a.RequestResponseBodyMethodProcessor : Writing [{status=ok, timestamp=2026-04-16T15:34:41.970145700Z}]
+2026-04-16T23:34:42.073+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-04-16T23:34:47.290+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : POST "/api/chat/block", parameters={}
+2026-04-16T23:34:47.291+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.ai.assistant.controller.ChatController#blockChat(ChatRequest)
+2026-04-16T23:34:47.407+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [ChatRequest(conversationId=null, message=??,????????, useTools=false, useMcp=false, format=null)]
+2026-04-16T23:34:47.433+08:00  INFO 6164 --- [ai-assistant] [nio-8080-exec-5] c.a.assistant.controller.ChatController  : Starting block chat - Conversation: 6fd91a5e-c86b-4f1c-a3e5-e918a4b7b90b, Message: ??,????????
+2026-04-16T23:34:47.837+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] o.s.web.client.DefaultRestClient         : Writing [ChatCompletionRequest[messages=[ChatCompletionMessage[rawContent=You are a helpful AI assistant., role=SYSTEM, name=null, toolCallId=null, toolCalls=null, refusal=null, audioOutput=null], ChatCompletionMessage[rawContent=??,????????, role=USER, name=null, toolCallId=null, toolCalls=null, refusal=null, audioOutput=null]], model=qwen-turbo, store=null, metadata=null, frequencyPenalty=null, logitBias=null, logprobs=null, topLogprobs=null, maxTokens=4096, maxCompletionTokens=null, n=null, outputModalities=null, audioParameters=null, presencePenalty=null, responseFormat=null, seed=null, serviceTier=null, stop=null, stream=false, streamOptions=null, temperature=0.7, topP=null, tools=null, toolChoice=null, parallelToolCalls=null, user=null, reasoningEffort=null]] as "application/json" with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+2026-04-16T23:34:49.132+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] o.s.web.client.DefaultRestClient         : Reading to [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion]
+2026-04-16T23:34:49.147+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-04-16T23:34:49.150+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Writing [ChatResponse(conversationId=6fd91a5e-c86b-4f1c-a3e5-e918a4b7b90b, content=It seems like your message (truncated)...]
+2026-04-16T23:34:49.151+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-04-16T23:34:53.603+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : POST "/api/chat/block", parameters={}
+2026-04-16T23:34:53.603+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.ai.assistant.controller.ChatController#blockChat(ChatRequest)
+2026-04-16T23:34:53.604+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [ChatRequest(conversationId=null, message=??????????, useTools=false, useMcp=false, format=null)]
+2026-04-16T23:34:53.604+08:00  INFO 6164 --- [ai-assistant] [nio-8080-exec-9] c.a.assistant.controller.ChatController  : Starting block chat - Conversation: aaa9bad1-8067-47bf-9d97-c36957c1574b, Message: ??????????
+2026-04-16T23:34:53.606+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] o.s.web.client.DefaultRestClient         : Writing [ChatCompletionRequest[messages=[ChatCompletionMessage[rawContent=You are a helpful AI assistant., role=SYSTEM, name=null, toolCallId=null, toolCalls=null, refusal=null, audioOutput=null], ChatCompletionMessage[rawContent=??????????, role=USER, name=null, toolCallId=null, toolCalls=null, refusal=null, audioOutput=null]], model=qwen-turbo, store=null, metadata=null, frequencyPenalty=null, logitBias=null, logprobs=null, topLogprobs=null, maxTokens=4096, maxCompletionTokens=null, n=null, outputModalities=null, audioParameters=null, presencePenalty=null, responseFormat=null, seed=null, serviceTier=null, stop=null, stream=false, streamOptions=null, temperature=0.7, topP=null, tools=null, toolChoice=null, parallelToolCalls=null, user=null, reasoningEffort=null]] as "application/json" with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+2026-04-16T23:34:54.146+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] o.s.web.client.DefaultRestClient         : Reading to [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion]
+2026-04-16T23:34:54.147+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-04-16T23:34:54.148+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] m.m.a.RequestResponseBodyMethodProcessor : Writing [ChatResponse(conversationId=aaa9bad1-8067-47bf-9d97-c36957c1574b, content=It seems like you might ha (truncated)...]
+2026-04-16T23:34:54.149+08:00 DEBUG 6164 --- [ai-assistant] [nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK

@@ -1,0 +1,11 @@
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\AiAssistantApplication.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\config\AiConfig.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\config\CorsConfig.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\config\ToolConfig.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\controller\ChatController.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\model\ChatRequest.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\model\ChatResponse.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\model\Conversation.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\service\ChatService.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\tool\AssistantTools.java
+E:\java\AI\20260416\backend\src\main\java\com\ai\assistant\tool\SkillRegistry.java
