@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <div v-for="(msg, index) in messages" :key="index" class="message-wrapper">
+    <div v-for="(msg, index) in messages" :key="msg.timestamp + '-' + index" class="message-wrapper">
       <div class="message" :class="msg.role">
         <div class="message-avatar">
           <span v-if="msg.role === 'user'">👤</span>
@@ -22,12 +22,10 @@
         </div>
         <div class="message-content">
           <div class="message-role">{{ msg.role === 'user' ? '你' : 'AI 助手' }}</div>
-          <div class="message-text" v-if="msg.role === 'user'">{{ msg.content }}</div>
-          <div class="message-text markdown-body" v-else v-html="renderMarkdown(msg.content)"></div>
-          <div v-if="msg.isStreaming" class="streaming-indicator">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
+          <div v-if="msg.role === 'user'" class="message-text">{{ msg.content }}</div>
+          <div v-else class="message-text markdown-body">
+            <div v-if="msg.content" v-html="renderMarkdown(msg.content)"></div>
+            <span v-if="msg.isStreaming" class="cursor"></span>
           </div>
         </div>
       </div>
@@ -39,6 +37,7 @@
 import { ref, watch, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
 import 'highlight.js/styles/github-dark.css'
+import hljs from 'highlight.js'
 
 const md = new MarkdownIt({
   html: true,
@@ -57,19 +56,11 @@ const md = new MarkdownIt({
   }
 })
 
-import hljs from 'highlight.js'
-
 export default {
   name: 'MessageList',
   props: {
-    messages: {
-      type: Array,
-      required: true
-    },
-    isStreaming: {
-      type: Boolean,
-      default: false
-    }
+    messages: { type: Array, required: true },
+    isStreaming: { type: Boolean, default: false }
   },
   emits: ['send'],
   setup(props) {
@@ -87,10 +78,7 @@ export default {
       return md.render(content)
     }
 
-    return {
-      messageListRef,
-      renderMarkdown
-    }
+    return { messageListRef, renderMarkdown }
   }
 }
 </script>
@@ -116,10 +104,7 @@ export default {
   max-width: 600px;
 }
 
-.welcome-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
-}
+.welcome-icon { font-size: 64px; margin-bottom: 24px; }
 
 .welcome-content h1 {
   font-size: 32px;
@@ -129,16 +114,9 @@ export default {
   -webkit-text-fill-color: transparent;
 }
 
-.welcome-content p {
-  color: var(--text-secondary);
-  margin-bottom: 32px;
-}
+.welcome-content p { color: var(--text-secondary); margin-bottom: 32px; }
 
-.suggestions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
+.suggestions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
 .suggestion-btn {
   padding: 16px;
@@ -157,9 +135,7 @@ export default {
   background-color: var(--bg-message-assistant);
 }
 
-.message-wrapper {
-  margin-bottom: 24px;
-}
+.message-wrapper { margin-bottom: 24px; }
 
 .message {
   display: flex;
@@ -169,27 +145,11 @@ export default {
   width: 100%;
 }
 
-.message.user {
-  background-color: var(--bg-message-user);
-  padding: 20px;
-  border-radius: 12px;
-}
+.message.user { background-color: var(--bg-message-user); padding: 20px; border-radius: 12px; }
+.message.assistant { background-color: var(--bg-message-assistant); padding: 20px; border-radius: 12px; }
 
-.message.assistant {
-  background-color: var(--bg-message-assistant);
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.message-avatar {
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.message-content {
-  flex: 1;
-  min-width: 0;
-}
+.message-avatar { font-size: 24px; flex-shrink: 0; }
+.message-content { flex: 1; min-width: 0; }
 
 .message-role {
   font-size: 12px;
@@ -198,19 +158,10 @@ export default {
   font-weight: 500;
 }
 
-.message-text {
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+.message-text { line-height: 1.7; word-break: break-word; }
 
-.message-text :deep(p) {
-  margin-bottom: 12px;
-}
-
-.message-text :deep(p:last-child) {
-  margin-bottom: 0;
-}
+.message-text :deep(p) { margin-bottom: 12px; }
+.message-text :deep(p:last-child) { margin-bottom: 0; }
 
 .message-text :deep(code) {
   background-color: rgba(255, 255, 255, 0.1);
@@ -228,25 +179,12 @@ export default {
   margin: 12px 0;
 }
 
-.message-text :deep(pre code) {
-  background: none;
-  padding: 0;
-}
+.message-text :deep(pre code) { background: none; padding: 0; }
 
-.message-text :deep(ul), .message-text :deep(ol) {
-  padding-left: 24px;
-  margin: 12px 0;
-}
+.message-text :deep(ul), .message-text :deep(ol) { padding-left: 24px; margin: 12px 0; }
+.message-text :deep(li) { margin-bottom: 6px; }
 
-.message-text :deep(li) {
-  margin-bottom: 6px;
-}
-
-.message-text :deep(table) {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 12px 0;
-}
+.message-text :deep(table) { border-collapse: collapse; width: 100%; margin: 12px 0; }
 
 .message-text :deep(th), .message-text :deep(td) {
   border: 1px solid var(--border-color);
@@ -254,10 +192,7 @@ export default {
   text-align: left;
 }
 
-.message-text :deep(th) {
-  background-color: var(--bg-chat);
-  font-weight: 600;
-}
+.message-text :deep(th) { background-color: var(--bg-chat); font-weight: 600; }
 
 .message-text :deep(blockquote) {
   border-left: 4px solid var(--primary-color);
@@ -266,33 +201,23 @@ export default {
   color: var(--text-secondary);
 }
 
-.message-text :deep(h1), .message-text :deep(h2), .message-text :deep(h3) {
-  margin: 20px 0 12px;
-}
-
+.message-text :deep(h1), .message-text :deep(h2), .message-text :deep(h3) { margin: 20px 0 12px; }
 .message-text :deep(h1) { font-size: 1.8em; }
 .message-text :deep(h2) { font-size: 1.5em; }
 .message-text :deep(h3) { font-size: 1.2em; }
 
-.streaming-indicator {
-  display: flex;
-  gap: 6px;
-  margin-top: 12px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 18px;
   background-color: var(--primary-color);
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out both;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s infinite;
 }
 
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 </style>

@@ -31,7 +31,7 @@ public class ChatService {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
         
-        String systemPrompt = "You are a helpful AI assistant.";
+        String systemPrompt = "你是一个helpful的中文AI助手。请用中文回复用户的问题。";
         
         if (skillId != null && skillRegistry.hasSkill(skillId)) {
             SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
@@ -61,7 +61,7 @@ public class ChatService {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
         
-        String systemPrompt = "You are a helpful AI assistant.";
+        String systemPrompt = "你是一个helpful的中文AI助手。请用中文回复用户的问题。";
         
         if (skillId != null && skillRegistry.hasSkill(skillId)) {
             SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);

@@ -1,4 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PropertiesComponent">{}</component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4e110335-3c72-4963-8ccc-2ec978e164d7" name="更改" comment="bugfix-流式接口前端响应">
+      <change beforePath="$PROJECT_DIR$/backend-error.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend2.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend3.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend4.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/frontend.log" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/frontend.log" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="dev" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;duwxsdc&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/duwxsdc/chartboat_20260416.git&quot;,
+    &quot;accountId&quot;: &quot;7ac1e523-f14f-4de7-b4c3-134784bd93a6&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3CRen0zsixD5G9aWrMx5ExIsblh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dev",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/java/AI/20260416/backend",
+    "project.structure.last.edited": "SDK",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "应用程序.AiAssistantApplication.executor": "Run"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="AiAssistantApplication" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="com.ai.assistant.AiAssistantApplication" />
+      <module name="ai-assistant" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="4e110335-3c72-4963-8ccc-2ec978e164d7" name="更改" comment="" />
+      <created>1776352973667</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1776352973667</updated>
+    </task>
+    <task id="LOCAL-00001" summary="11">
+      <option name="closed" value="true" />
+      <created>1776354534467</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1776354534468</updated>
+    </task>
+    <task id="LOCAL-00002" summary="bugfix-流式接口前端响应">
+      <option name="closed" value="true" />
+      <created>1776438685928</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1776438685928</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="dev" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/dev" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="dev" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="11" />
+    <MESSAGE value="bugfix-流式接口前端响应" />
+    <option name="LAST_COMMIT_MESSAGE" value="bugfix-流式接口前端响应" />
+  </component>
 </project>

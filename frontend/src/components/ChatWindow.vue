@@ -27,6 +27,7 @@
     <MessageList 
       :messages="messages" 
       :is-streaming="isStreaming"
+      @send="handleSendFromList"
     />
 
     <MessageInput 
@@ -43,23 +44,11 @@ import MessageInput from './MessageInput.vue'
 
 export default {
   name: 'ChatWindow',
-  components: {
-    MessageList,
-    MessageInput
-  },
+  components: { MessageList, MessageInput },
   props: {
-    conversationId: {
-      type: String,
-      required: true
-    },
-    messages: {
-      type: Array,
-      required: true
-    },
-    isStreaming: {
-      type: Boolean,
-      default: false
-    }
+    conversationId: { type: String, required: true },
+    messages: { type: Array, required: true },
+    isStreaming: { type: Boolean, default: false }
   },
   emits: ['send-message', 'clear-conversation'],
   setup(props, { emit }) {
@@ -73,82 +62,24 @@ export default {
       })
     }
 
-    return {
-      selectedFormat,
-      useTools,
-      handleSend
+    // 处理来自MessageList的建议按钮点击
+    const handleSendFromList = (message) => {
+      handleSend(message)
     }
+
+    return { selectedFormat, useTools, handleSend, handleSendFromList }
   }
 }
 </script>
 
 <style scoped>
-.chat-window {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: var(--bg-dark);
-}
-
-.chat-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--bg-sidebar);
-}
-
-.chat-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.format-select {
-  padding: 8px 12px;
-  background-color: var(--bg-chat);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.tool-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-.tool-toggle input[type="checkbox"] {
-  accent-color: var(--primary-color);
-}
-
-.clear-btn {
-  padding: 8px 12px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.clear-btn:hover {
-  border-color: #ff6b6b;
-  color: #ff6b6b;
-}
+.chat-window { display: flex; flex-direction: column; height: 100%; background-color: var(--bg-dark); }
+.chat-header { padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-sidebar); }
+.chat-header h2 { font-size: 18px; font-weight: 600; }
+.header-actions { display: flex; align-items: center; gap: 16px; }
+.format-select { padding: 8px 12px; background-color: var(--bg-chat); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 13px; cursor: pointer; }
+.tool-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.tool-toggle input[type="checkbox"] { accent-color: var(--primary-color); }
+.clear-btn { padding: 8px 12px; background: transparent; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: all 0.2s; }
+.clear-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
 </style>
