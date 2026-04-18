@@ -7,16 +7,41 @@
 :root {
   --primary-color: #10a37f;
   --primary-hover: #0d8c6d;
+  --primary-light: rgba(16, 163, 127, 0.1);
+  --primary-gradient: linear-gradient(135deg, #10a37f, #34d399);
+  
   --bg-dark: #212121;
   --bg-sidebar: #171717;
   --bg-chat: #2f2f2f;
   --bg-message-user: #2f2f2f;
   --bg-message-assistant: #1e1e1e;
   --bg-input: #2f2f2f;
+  --bg-card: #333333;
+  
   --text-primary: #ececec;
   --text-secondary: #b4b4b4;
+  --text-muted: #888888;
+  
   --border-color: #424242;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --border-light: #555555;
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
 }
 
 body {
@@ -25,6 +50,8 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #app {
@@ -43,6 +70,7 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 4px;
+  transition: background var(--transition-normal);
 }
 
 ::-webkit-scrollbar-thumb:hover {
