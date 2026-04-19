@@ -19,8 +19,15 @@
         :is-streaming="isStreaming"
         @send-message="sendMessage"
         @clear-conversation="clearConversation"
+        @open-tools-panel="showToolsPanel = true"
+        ref="chatWindowRef"
       />
     </main>
+    <ToolsPanel
+      :show-tools-panel="showToolsPanel"
+      @close="showToolsPanel = false"
+      @use-skill="handleUseSkill"
+    />
   </div>
 </template>
 
@@ -29,10 +36,11 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import ChatWindow from './components/ChatWindow.vue'
 import AuthPage from './components/AuthPage.vue'
+import ToolsPanel from './components/ToolsPanel.vue'
 
 export default {
   name: 'App',
-  components: { Sidebar, ChatWindow, AuthPage },
+  components: { Sidebar, ChatWindow, AuthPage, ToolsPanel },
   setup() {
     const isAuthenticated = ref(false)
     const user = ref(null)
@@ -40,6 +48,9 @@ export default {
     const currentConversationId = ref('')
     const isStreaming = ref(false)
     const loading = ref(false)
+    const showToolsPanel = ref(false)
+    const chatWindowRef = ref(null)
+    const skillsCache = ref([])
 
     const currentMessages = computed(() => {
       const conv = conversations.find(c => c.id === currentConversationId.value)
@@ -209,7 +220,6 @@ export default {
           }
         }
 
-        // 确保最终状态更新
         assistantMsg.isStreaming = false
         isStreaming.value = false
       } catch (error) {
@@ -218,7 +228,6 @@ export default {
         assistantMsg.isStreaming = false
         isStreaming.value = false
       } finally {
-        // 最终确保状态重置
         isStreaming.value = false
         assistantMsg.isStreaming = false
         console.log('sendMessage completed, isStreaming:', isStreaming.value)
@@ -246,6 +255,33 @@ export default {
       }
     }
 
+    const handleUseSkill = async (skillId) => {
+      console.log('handleUseSkill called with skillId:', skillId)
+      showToolsPanel.value = false
+      
+      try {
+        const response = await fetch('/api/chat/skills', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          const skill = data.skills.find(s => s.id === skillId)
+          
+          if (skill && skill.examplePrompt) {
+            console.log('Skill found:', skill.name, 'Example prompt:', skill.examplePrompt)
+            handleFillInput(skill.examplePrompt)
+          } else {
+            console.warn('Skill examplePrompt not found for skillId:', skillId)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to use skill:', error)
+      }
+    }
+
     onMounted(() => {
       const token = localStorage.getItem('token')
       const userStr = localStorage.getItem('user')
@@ -264,13 +300,16 @@ export default {
       currentMessages,
       isStreaming,
       loading,
+      showToolsPanel,
+      chatWindowRef,
       handleAuthSuccess,
       handleLogout,
       startNewChat,
       selectConversation,
       deleteConversation,
       sendMessage,
-      clearConversation
+      clearConversation,
+      handleUseSkill
     }
   }
 }

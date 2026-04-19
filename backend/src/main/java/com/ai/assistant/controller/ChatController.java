@@ -17,7 +17,6 @@ import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -133,28 +132,58 @@ public class ChatController {
     }
 
     @DeleteMapping("/conversation/{conversationId}")
-    public Map<String, String> clearConversation(@PathVariable String conversationId) {
+    public java.util.Map<String, String> clearConversation(@PathVariable String conversationId) {
         var user = authService.getCurrentUser();
         if (user == null) {
             throw new RuntimeException("User not authenticated");
         }
 
         chatService.clearConversation(user.getId(), conversationId);
-        return Map.of("status", "success", "message", "Conversation cleared");
+        return java.util.Map.of("status", "success", "message", "Conversation cleared");
     }
 
     @GetMapping("/skills")
-    public Map<String, SkillRegistry.Skill> getSkills() {
-        return skillRegistry.getAllSkills();
+    public java.util.Map<String, Object> getSkills() {
+        var skills = skillRegistry.getAllSkills();
+        var skillList = skills.values().stream()
+                .map(skill -> java.util.Map.of(
+                        "id", skill.id(),
+                        "name", skill.name(),
+                        "description", skill.systemPrompt().substring(0, Math.min(100, skill.systemPrompt().length())) + "...",
+                        "category", skill.category(),
+                        "examplePrompt", skill.examplePrompt()
+                ))
+                .collect(Collectors.toList());
+        
+        return java.util.Map.of(
+                "status", "success",
+                "skills", skillList
+        );
+    }
+
+    @GetMapping("/tools")
+    public java.util.Map<String, Object> getTools() {
+        var tools = chatService.getAvailableTools();
+        var toolList = tools.stream()
+                .map(tool -> java.util.Map.of(
+                        "name", tool.name(),
+                        "description", tool.description()
+                ))
+                .collect(Collectors.toList());
+        
+        return java.util.Map.of(
+                "status", "success",
+                "tools", toolList
+        );
     }
 
     @GetMapping("/health")
-    public Map<String, String> health() {
-        return Map.of("status", "ok", "timestamp", Instant.now().toString());
+    public java.util.Map<String, String> health() {
+        return java.util.Map.of("status", "ok", "timestamp", Instant.now().toString());
     }
 
     @GetMapping("/conversations")
-    public Map<String, Object> getConversations() {
+    public java.util.Map<String, Object> getConversations() {
         var user = authService.getCurrentUser();
         if (user == null) {
             throw new RuntimeException("User not authenticated");
@@ -162,7 +191,7 @@ public class ChatController {
 
         List<Conversation> conversations = conversationService.getConversationsByUserId(user.getId());
         var conversationList = conversations.stream()
-                .map(conv -> Map.of(
+                .map(conv -> java.util.Map.of(
                         "id", conv.getConversationId(),
                         "title", conv.getTitle(),
                         "createdAt", conv.getCreatedAt(),
@@ -170,14 +199,14 @@ public class ChatController {
                 ))
                 .collect(Collectors.toList());
 
-        return Map.of(
+        return java.util.Map.of(
                 "status", "success",
                 "conversations", conversationList
         );
     }
 
     @GetMapping("/conversation/{conversationId}")
-    public Map<String, Object> getConversation(@PathVariable String conversationId) {
+    public java.util.Map<String, Object> getConversation(@PathVariable String conversationId) {
         var user = authService.getCurrentUser();
         if (user == null) {
             throw new RuntimeException("User not authenticated");
@@ -191,7 +220,7 @@ public class ChatController {
         var conv = conversation.get();
         var messages = conversationService.getMessagesByConversationId(conv.getId());
         var messageList = messages.stream()
-                .map(msg -> Map.of(
+                .map(msg -> java.util.Map.of(
                         "id", msg.getId(),
                         "role", msg.getRole(),
                         "content", msg.getContent(),
@@ -199,9 +228,9 @@ public class ChatController {
                 ))
                 .collect(Collectors.toList());
 
-        return Map.of(
+        return java.util.Map.of(
                 "status", "success",
-                "conversation", Map.of(
+                "conversation", java.util.Map.of(
                         "id", conv.getConversationId(),
                         "title", conv.getTitle(),
                         "createdAt", conv.getCreatedAt(),
@@ -212,7 +241,7 @@ public class ChatController {
     }
 
     @PutMapping("/conversation/{conversationId}/title")
-    public Map<String, Object> updateConversationTitle(@PathVariable String conversationId, @RequestBody Map<String, String> request) {
+    public java.util.Map<String, Object> updateConversationTitle(@PathVariable String conversationId, @RequestBody java.util.Map<String, String> request) {
         var user = authService.getCurrentUser();
         if (user == null) {
             throw new RuntimeException("User not authenticated");
@@ -228,9 +257,9 @@ public class ChatController {
             throw new RuntimeException("Conversation not found");
         }
 
-        return Map.of(
+        return java.util.Map.of(
                 "status", "success",
-                "conversation", Map.of(
+                "conversation", java.util.Map.of(
                         "id", updatedConversation.getConversationId(),
                         "title", updatedConversation.getTitle()
                 )

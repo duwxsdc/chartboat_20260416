@@ -1,10 +1,6 @@
 package com.ai.assistant.service;
 
-import com.ai.assistant.model.Conversation;
-import com.ai.assistant.service.ConversationService;
-// import com.ai.assistant.service.RagService;
 import com.ai.assistant.tool.SkillRegistry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -15,21 +11,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChatService {
 
     private final ChatModel chatModel;
     private final ChatMemory chatMemory;
     private final SkillRegistry skillRegistry;
     private final ConversationService conversationService;
-    // private final RagService ragService;
+    private ToolCallback[] toolCallbacks;
+
+    @Autowired
+    public ChatService(ChatModel chatModel, ChatMemory chatMemory, 
+                      SkillRegistry skillRegistry, ConversationService conversationService) {
+        this.chatModel = chatModel;
+        this.chatMemory = chatMemory;
+        this.skillRegistry = skillRegistry;
+        this.conversationService = conversationService;
+    }
 
     @Autowired(required = false)
-    private ToolCallback[] toolCallbacks;
+    public void setToolCallbacks(ToolCallback[] toolCallbacks) {
+        this.toolCallbacks = toolCallbacks;
+    }
 
     private static final String SYSTEM_PROMPT = "你是一个helpful的中文AI助手。请用中文回复用户的问题。" +
             "当需要展示数学计算时，请使用简单易读的格式，不要使用LaTeX或数学公式符号（如\\times、\\frac等）。" +
@@ -39,7 +47,6 @@ public class ChatService {
         String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
         String userConversationId = userId + ":" + convId;
 
-        // 保存用户消息
         saveUserMessage(userId, convId, message);
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
@@ -49,17 +56,12 @@ public class ChatService {
         if (skillId != null && skillRegistry.hasSkill(skillId)) {
             SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
             systemPrompt = skill.systemPrompt();
+            log.info("Using skill: {}", skillId);
         }
 
         if (format != null && !format.isBlank()) {
             systemPrompt += " " + buildFormatPrompt(format);
         }
-
-        // 集成 RAG 功能
-        // String ragContext = ragService.getRelevantContext(message, 3);
-        // if (!ragContext.isEmpty()) {
-        //     systemPrompt += "\n\n基于以下相关信息回答问题：\n" + ragContext;
-        // }
 
         builder.defaultSystem(systemPrompt);
 
@@ -67,10 +69,16 @@ public class ChatService {
 
         StringBuilder fullResponse = new StringBuilder();
 
-        return chatClient.prompt()
+        ChatClient.ChatClientRequestSpec requestSpec = chatClient.prompt()
                 .user(message)
-                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(userConversationId).build())
-                .stream()
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(userConversationId).build());
+
+        if (useTools && toolCallbacks != null && toolCallbacks.length > 0) {
+            log.info("Enabling {} tools for this request", toolCallbacks.length);
+            requestSpec.tools(toolCallbacks);
+        }
+
+        return requestSpec.stream()
                 .content()
                 .doOnNext(content -> {
                     log.debug("Stream chunk: {}", content);
@@ -78,25 +86,59 @@ public class ChatService {
                 })
                 .doOnComplete(() -> {
                     log.info("Stream completed for user: {}, conversation: {}", userId, convId);
-                    // 保存助手回复
                     saveAssistantMessage(userId, convId, fullResponse.toString());
                 })
                 .doOnError(error -> {
                     log.error("Stream error: {}", error.getMessage());
-                    // 保存错误消息
                     saveAssistantMessage(userId, convId, "Error: " + error.getMessage());
                 });
     }
 
+    public String chatBlock(Long userId, String conversationId, String message, boolean useTools, String skillId, String format) {
+        String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
+        String userConversationId = userId + ":" + convId;
+
+        saveUserMessage(userId, convId, message);
+
+        ChatClient.Builder builder = ChatClient.builder(chatModel);
+
+        String systemPrompt = SYSTEM_PROMPT;
+
+        if (skillId != null && skillRegistry.hasSkill(skillId)) {
+            SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
+            systemPrompt = skill.systemPrompt();
+            log.info("Using skill: {}", skillId);
+        }
+
+        if (format != null && !format.isBlank()) {
+            systemPrompt += " " + buildFormatPrompt(format);
+        }
+
+        ChatClient chatClient = builder.defaultSystem(systemPrompt).build();
+
+        ChatClient.ChatClientRequestSpec requestSpec = chatClient.prompt()
+                .user(message)
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(userConversationId).build());
+
+        if (useTools && toolCallbacks != null && toolCallbacks.length > 0) {
+            log.info("Enabling {} tools for this request", toolCallbacks.length);
+            requestSpec.tools(toolCallbacks);
+        }
+
+        String response = requestSpec.call().content();
+
+        saveAssistantMessage(userId, convId, response);
+
+        return response;
+    }
+
     private void saveUserMessage(Long userId, String conversationId, String message) {
         try {
-            // 检查会话是否存在，不存在则创建
             var existingConversation = conversationService.getConversationByUserIdAndConversationId(userId, conversationId);
             if (existingConversation.isEmpty()) {
                 String title = message.length() > 50 ? message.substring(0, 50) + "..." : message;
                 conversationService.createConversation(userId, conversationId, title);
             }
-            // 保存用户消息
             var conversation = conversationService.getConversationByUserIdAndConversationId(userId, conversationId).orElse(null);
             if (conversation != null) {
                 conversationService.saveMessage(conversation.getId(), "user", message);
@@ -115,46 +157,6 @@ public class ChatService {
         } catch (Exception e) {
             log.error("Failed to save assistant message: {}", e.getMessage());
         }
-    }
-
-    public String chatBlock(Long userId, String conversationId, String message, boolean useTools, String skillId, String format) {
-        String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
-        String userConversationId = userId + ":" + convId;
-
-        // 保存用户消息
-        saveUserMessage(userId, convId, message);
-
-        ChatClient.Builder builder = ChatClient.builder(chatModel);
-
-        String systemPrompt = SYSTEM_PROMPT;
-
-        if (skillId != null && skillRegistry.hasSkill(skillId)) {
-            SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
-            systemPrompt = skill.systemPrompt();
-        }
-
-        if (format != null && !format.isBlank()) {
-            systemPrompt += " " + buildFormatPrompt(format);
-        }
-
-        // 集成 RAG 功能
-        // String ragContext = ragService.getRelevantContext(message, 3);
-        // if (!ragContext.isEmpty()) {
-        //     systemPrompt += "\n\n基于以下相关信息回答问题：\n" + ragContext;
-        // }
-
-        ChatClient chatClient = builder.defaultSystem(systemPrompt).build();
-
-        String response = chatClient.prompt()
-                .user(message)
-                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(userConversationId).build())
-                .call()
-                .content();
-
-        // 保存助手回复
-        saveAssistantMessage(userId, convId, response);
-
-        return response;
     }
 
     public String getConversationId() {
@@ -176,5 +178,23 @@ public class ChatService {
             case "bullet" -> "Present your response as a bulleted list with clear, concise points.";
             default -> format;
         };
+    }
+
+    public List<ToolInfo> getAvailableTools() {
+        if (toolCallbacks == null || toolCallbacks.length == 0) {
+            return List.of();
+        }
+        // 简化返回工具信息，不调用可能不存在的API
+        return List.of(new ToolInfo("tools", toolCallbacks.length + " tools available"));
+    }
+
+    public record ToolInfo(String name, String description) {}
+
+    public SkillRegistry.Skill getSkill(String skillId) {
+        return skillRegistry.getSkill(skillId);
+    }
+
+    public Map<String, SkillRegistry.Skill> getAllSkills() {
+        return skillRegistry.getAllSkills();
     }
 }

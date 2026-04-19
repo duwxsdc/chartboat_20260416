@@ -1,42 +1,33 @@
 <template>
   <div class="auth-container">
     <div class="auth-card">
-      <h1>{{ isLogin ? '登录' : '注册' }}</h1>
-      
-      <div v-if="error" class="error-message">{{ error }}</div>
-      
+      <h2>{{ isLogin ? '登录' : '注册' }}</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label>用户名</label>
-          <input v-model="form.username" type="text" required />
+          <input v-model="form.username" type="text" required placeholder="输入用户名" />
         </div>
-        
         <div class="form-group">
           <label>密码</label>
-          <input v-model="form.password" type="password" required />
+          <input v-model="form.password" type="password" required placeholder="输入密码" />
         </div>
-        
         <div v-if="!isLogin" class="form-group">
           <label>邮箱</label>
-          <input v-model="form.email" type="email" required />
+          <input v-model="form.email" type="email" required placeholder="输入邮箱" />
         </div>
-        
-        <button type="submit" class="btn-primary" :disabled="loading">
+        <div v-if="error" class="error-message">
+          {{ error }}
+        </div>
+        <button type="submit" :disabled="loading">
           {{ loading ? '处理中...' : (isLogin ? '登录' : '注册') }}
         </button>
       </form>
-      
-      <div class="auth-toggle">
-        {{ isLogin ? '还没有账号？' : '已有账号？' }}
-        <button @click="isLogin = !isLogin" class="btn-link">
-          {{ isLogin ? '立即注册' : '立即登录' }}
-        </button>
-      </div>
-      
+      <p class="switch-mode">
+        {{ isLogin ? '没有账号?' : '已有账号?' }}
+        <a href="#" @click.prevent="isLogin = !isLogin">{{ isLogin ? '立即注册' : '立即登录' }}</a>
+      </p>
       <div class="test-accounts">
-        <h3>测试账号</h3>
-        <div>用户名: test, 密码: test123</div>
-        <div>用户名: admin, 密码: admin123</div>
+        <p>测试账号：test / test123</p>
       </div>
     </div>
   </div>
@@ -69,6 +60,7 @@ export default {
       
       try {
         const url = isLogin.value ? '/api/auth/login' : '/api/auth/register'
+        
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -82,18 +74,43 @@ export default {
           })
         })
 
-        const contentType = response.headers.get('content-type')
-        let data
-        
-        if (contentType && contentType.includes('application/json')) {
-          data = await response.json()
-        } else {
-          const text = await response.text()
-          throw new Error(`服务器返回非JSON响应: ${text || '空响应'}`)
+        // 检查响应状态
+        if (!response.ok) {
+          // 尝试解析错误信息
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              const errorData = await response.json()
+              throw new Error(errorData.error || errorData.message || `请求失败 (${response.status})`)
+            } catch (e) {
+              if (e.message.includes('请求失败')) {
+                throw e
+              }
+              throw new Error(`请求失败 (${response.status}): ${response.statusText}`)
+            }
+          } else {
+            throw new Error(`请求失败 (${response.status}): ${response.statusText}`)
+          }
         }
 
-        if (!response.ok) {
-          throw new Error(data.error || '认证失败')
+        // 尝试解析成功响应
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text()
+          console.error('Non-JSON response:', text)
+          throw new Error('服务器返回格式错误，请稍后重试')
+        }
+
+        let data
+        try {
+          data = await response.json()
+        } catch (e) {
+          console.error('JSON parse error:', e)
+          throw new Error('响应数据解析失败，请稍后重试')
+        }
+
+        if (!data.token || !data.user) {
+          throw new Error('服务器返回数据格式错误')
         }
 
         localStorage.setItem('token', data.token)
@@ -101,7 +118,8 @@ export default {
         
         props.onAuthSuccess(data)
       } catch (err) {
-        error.value = err.message
+        console.error('Auth error:', err)
+        error.value = err.message || '网络错误，请检查服务器是否运行'
       } finally {
         loading.value = false
       }
@@ -150,258 +168,116 @@ export default {
   background: rgba(255, 255, 255, 0.95);
   padding: 2.5rem;
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 420px;
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.auth-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-}
-
-.auth-card h1 {
-  margin-bottom: 2rem;
-  color: #333;
+h2 {
   text-align: center;
-  font-size: 2rem;
+  color: #1a202c;
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-}
-
-.auth-card h1::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 2px;
-  margin: 0.5rem auto 0;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scaleX(1); }
-  50% { transform: scaleX(1.2); }
-}
-
-.error-message {
-  background: rgba(255, 107, 107, 0.1);
-  color: #c62828;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-  border-left: 4px solid #c62828;
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
 }
 
 .form-group {
   margin-bottom: 1.25rem;
-  position: relative;
 }
 
-.form-group label {
+label {
   display: block;
   margin-bottom: 0.5rem;
+  color: #4a5568;
   font-weight: 500;
-  color: #555;
   font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.form-group input {
+input {
   width: 100%;
-  padding: 1rem;
-  border: 2px solid #e0e0e0;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 1rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s;
+  background: white;
+  color: #2d3748;
+  box-sizing: border-box;
 }
 
-.form-group input:focus {
+input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: white;
-  transform: translateY(-2px);
 }
 
-.btn-primary {
+button {
   width: 100%;
-  padding: 1rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 1.5rem;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s;
+  margin-top: 1rem;
 }
 
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
+button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
 
-.btn-primary:hover:not(:disabled)::before {
-  left: 100%;
-}
-
-.btn-primary:disabled {
-  background: #ccc;
+button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-.auth-toggle {
-  margin-top: 1.5rem;
+.error-message {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 4px solid #c53030;
+}
+
+.switch-mode {
   text-align: center;
-  font-size: 0.95rem;
-  color: #666;
+  margin-top: 1.5rem;
+  color: #718096;
+  font-size: 0.9rem;
 }
 
-.btn-link {
-  background: none;
-  border: none;
+.switch-mode a {
   color: #667eea;
-  cursor: pointer;
-  font-size: 0.95rem;
+  text-decoration: none;
   font-weight: 600;
-  padding: 0 0.5rem;
-  transition: all 0.3s ease;
-  position: relative;
+  transition: color 0.3s;
 }
 
-.btn-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: #667eea;
-  transition: width 0.3s ease;
-}
-
-.btn-link:hover {
+.switch-mode a:hover {
   color: #764ba2;
-}
-
-.btn-link:hover::after {
-  width: 100%;
+  text-decoration: underline;
 }
 
 .test-accounts {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 0.9rem;
-  color: #666;
-  background: rgba(0, 0, 0, 0.02);
-  padding: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f7fafc;
   border-radius: 8px;
-  margin-top: 2rem;
+  border: 1px solid #e2e8f0;
 }
 
-.test-accounts h3 {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  color: #333;
-  font-weight: 600;
+.test-accounts p {
+  margin: 0;
   text-align: center;
-}
-
-.test-accounts div {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 4px;
-  text-align: center;
-  transition: background 0.3s ease;
-}
-
-.test-accounts div:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Loading animation */
-.btn-primary:disabled::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .auth-card {
-    margin: 0 1rem;
-    padding: 2rem;
-  }
-  
-  .auth-card h1 {
-    font-size: 1.75rem;
-  }
-  
-  .form-group input {
-    padding: 0.8rem;
-  }
-  
-  .btn-primary {
-    padding: 0.8rem;
-  }
+  color: #718096;
+  font-size: 0.875rem;
 }
 </style>

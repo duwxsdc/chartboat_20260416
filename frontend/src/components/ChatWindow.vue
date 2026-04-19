@@ -3,6 +3,13 @@
     <header class="chat-header">
       <h2>AI 智能助手</h2>
       <div class="header-actions">
+        <button class="tools-btn" @click="$emit('open-tools-panel')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          工具与技能
+        </button>
         <select v-model="selectedFormat" class="format-select">
           <option value="markdown">Markdown</option>
           <option value="json">JSON</option>
@@ -52,7 +59,7 @@ export default {
     messages: { type: Array, required: true },
     isStreaming: { type: Boolean, default: false }
   },
-  emits: ['send-message', 'clear-conversation'],
+  emits: ['send-message', 'clear-conversation', 'open-tools-panel'],
   setup(props, { emit }) {
     const selectedFormat = ref('markdown')
     const useTools = ref(false)
@@ -65,19 +72,17 @@ export default {
       })
     }
 
-    // 处理来自MessageList的建议按钮点击
     const handleSendFromList = (message) => {
       handleSend(message)
     }
 
-    // 处理填充输入框的事件
     const handleFillInput = (message) => {
       if (messageInputRef.value) {
         messageInputRef.value.fillInput(message)
       }
     }
 
-    return { selectedFormat, useTools, handleSend, handleSendFromList, messageInputRef, handleFillInput }
+    return { selectedFormat, useTools, handleSend, handleSendFromList, handleFillInput, messageInputRef }
   }
 }
 </script>
@@ -127,6 +132,27 @@ export default {
   align-items: center;
   gap: var(--spacing-md);
   flex-wrap: wrap;
+}
+
+.tools-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary-gradient);
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.tools-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 163, 127, 0.3);
 }
 
 .format-select {
@@ -209,7 +235,6 @@ export default {
   transform: rotate(90deg);
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .chat-header {
     padding: var(--spacing-md);
@@ -239,7 +264,8 @@ export default {
   }
   
   .format-select,
-  .clear-btn {
+  .clear-btn,
+  .tools-btn {
     width: 100%;
     justify-content: center;
   }
