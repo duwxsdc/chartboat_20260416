@@ -26,6 +26,45 @@ spring:
     max-history: 20
     ttl-minutes: 30
 
+  # Redis 配置
+  data:
+    redis:
+      host: 
+      port: 6379
+      password: 
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+
+# 上下文管理配置
+context:
+  management:
+    # 分层存储阈值
+    hot-tier-size: 50
+    warm-tier-size: 150
+    # 自动清理配置
+    auto-cleanup:
+      enabled: true
+      max-conversation-size: 200
+      max-idle-hours: 24
+      max-total-size-mb: 500
+    # 压缩配置
+    compression:
+      enabled: true
+      threshold-bytes: 1024
+    # 摘要配置
+    summary:
+      enabled: true
+      max-messages-before-summary: 100
+      summary-model: 
+    # 监控配置
+    monitor:
+      enabled: true
+      log-interval-seconds: 60
+
 # CORS 配置
 cors:
   allowed-origins: http://localhost:5173,http://localhost:3000,http://localhost:8080

@@ -26,13 +26,17 @@ public class ChatService {
     @Autowired(required = false)
     private ToolCallback[] toolCallbacks;
 
+    private static final String SYSTEM_PROMPT = "你是一个helpful的中文AI助手。请用中文回复用户的问题。" +
+            "当需要展示数学计算时，请使用简单易读的格式，不要使用LaTeX或数学公式符号（如\\times、\\frac等）。" +
+            "对于算术计算，请直接使用标准运算符（*、/、+、-）和清晰的步骤说明，让所有人都能轻松理解。";
+
     public Flux<String> chatStream(String conversationId, String message, boolean useTools, String skillId, String format) {
         String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
         
-        String systemPrompt = "你是一个helpful的中文AI助手。请用中文回复用户的问题。";
-        
+        String systemPrompt = SYSTEM_PROMPT;
+
         if (skillId != null && skillRegistry.hasSkill(skillId)) {
             SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
             systemPrompt = skill.systemPrompt();
@@ -41,7 +45,7 @@ public class ChatService {
         if (format != null && !format.isBlank()) {
             systemPrompt += " " + buildFormatPrompt(format);
         }
-        
+
         builder.defaultSystem(systemPrompt);
         
         ChatClient chatClient = builder.build();
@@ -60,9 +64,9 @@ public class ChatService {
         String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
-        
-        String systemPrompt = "你是一个helpful的中文AI助手。请用中文回复用户的问题。";
-        
+
+        String systemPrompt = SYSTEM_PROMPT;
+
         if (skillId != null && skillRegistry.hasSkill(skillId)) {
             SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
             systemPrompt = skill.systemPrompt();

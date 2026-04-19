@@ -36,6 +36,8 @@
 <script>
 import { ref, watch, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
 import 'highlight.js/styles/github-dark.css'
 import hljs from 'highlight.js'
 
@@ -56,6 +58,28 @@ const md = new MarkdownIt({
   }
 })
 
+function renderLatex(text) {
+  if (!text) return ''
+
+  text = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, latex) => {
+    try {
+      return `<div class="math-block">${katex.renderToString(latex.trim(), { displayMode: true, throwOnError: false })}</div>`
+    } catch (e) {
+      return `<div class="math-block math-error">${match}</div>`
+    }
+  })
+
+  text = text.replace(/\$([^\$\n]+?)\$/g, (match, latex) => {
+    try {
+      return katex.renderToString(latex.trim(), { displayMode: false, throwOnError: false })
+    } catch (e) {
+      return `<span class="math-error">${match}</span>`
+    }
+  })
+
+  return text
+}
+
 export default {
   name: 'MessageList',
   props: {
@@ -75,13 +99,14 @@ export default {
 
     const renderMarkdown = (content) => {
       if (!content) return ''
-      return md.render(content)
+      let html = md.render(content)
+      html = renderLatex(html)
+      return html
     }
 
     return { messageListRef, renderMarkdown }
   }
-}
-</script>
+}</script>
 
 <style scoped>
 .message-list {
@@ -516,5 +541,29 @@ export default {
   .message-text {
     font-size: 14px;
   }
+}
+
+.message-text :deep(.math-block) {
+  margin: var(--spacing-md) 0;
+  overflow-x: auto;
+  padding: var(--spacing-md);
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.message-text :deep(.katex) {
+  font-size: 1.1em;
+}
+
+.message-text :deep(.katex-display) {
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.message-text :deep(.math-error) {
+  color: var(--text-muted);
+  font-family: monospace;
 }
 </style>

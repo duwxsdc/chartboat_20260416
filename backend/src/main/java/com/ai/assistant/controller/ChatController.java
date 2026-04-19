@@ -1,5 +1,7 @@
 package com.ai.assistant.controller;
 
+import com.ai.assistant.memory.ConversationBackupService;
+import com.ai.assistant.memory.TieredChatMemory;
 import com.ai.assistant.model.ChatRequest;
 import com.ai.assistant.model.ChatResponse;
 import com.ai.assistant.service.ChatService;
@@ -23,6 +25,8 @@ public class ChatController {
 
     private final ChatService chatService;
     private final SkillRegistry skillRegistry;
+    private final TieredChatMemory tieredChatMemory;
+    private final ConversationBackupService backupService;
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<ChatResponse>> streamChat(@RequestBody ChatRequest request) {
@@ -125,5 +129,30 @@ public class ChatController {
     @GetMapping("/health")
     public Map<String, String> health() {
         return Map.of("status", "ok", "timestamp", Instant.now().toString());
+    }
+
+    @GetMapping("/conversation/{conversationId}/stats")
+    public Map<String, Object> getConversationStats(@PathVariable String conversationId) {
+        return tieredChatMemory.getConversationStats(conversationId);
+    }
+
+    @PostMapping("/conversation/{conversationId}/rollback")
+    public Map<String, Object> rollbackConversation(@PathVariable String conversationId) {
+        boolean success = tieredChatMemory.rollback(conversationId);
+        return Map.of(
+                "status", success ? "success" : "failed",
+                "message", success ? "Rollback completed" : "Rollback failed - no backup found"
+        );
+    }
+
+    @GetMapping("/conversation/{conversationId}/backups")
+    public Map<String, Object> getBackupStats(@PathVariable String conversationId) {
+        return backupService.getBackupStats(conversationId);
+    }
+
+    @DeleteMapping("/conversation/{conversationId}/backups")
+    public Map<String, String> deleteAllBackups(@PathVariable String conversationId) {
+        int count = backupService.deleteAllBackups(conversationId);
+        return Map.of("status", "success", "deletedCount", String.valueOf(count));
     }
 }
