@@ -11,6 +11,7 @@
         <div class="section">
           <h4>🔧 可用工具</h4>
           <div v-if="loading" class="loading">加载中...</div>
+          <div v-if="error" class="error">加载失败，请重试</div>
           <div v-else-if="tools.length === 0" class="empty">暂无工具</div>
           <div v-else class="tools-list">
             <div v-for="tool in tools" :key="tool.name" class="tool-item">
@@ -41,7 +42,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 export default {
   name: 'ToolsPanel',
@@ -56,15 +57,18 @@ export default {
     const tools = ref([])
     const skills = ref([])
     const loading = ref(false)
+    const error = ref(false)
 
     const loadToolsAndSkills = async () => {
       loading.value = true
+      error.value = false
       try {
         const token = localStorage.getItem('token')
         
         // Fetch tools
         const toolsResponse = await fetch('/api/chat/tools', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: AbortSignal.timeout(10000)
         })
         if (toolsResponse.ok) {
           const toolsData = await toolsResponse.json()
@@ -73,13 +77,15 @@ export default {
 
         // Fetch skills
         const skillsResponse = await fetch('/api/chat/skills', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: AbortSignal.timeout(10000)
         })
         if (skillsResponse.ok) {
           const skillsData = await skillsResponse.json()
           skills.value = skillsData.skills || []
         }
       } catch (error) {
+        error.value = true
         console.error('Failed to load tools and skills:', error)
       } finally {
         loading.value = false
@@ -101,19 +107,20 @@ export default {
       }
     })
 
+    watch(() => props.showToolsPanel, (newVal) => {
+      if (newVal) {
+        loadToolsAndSkills()
+      }
+    })
+
     return {
       tools,
       skills,
       loading,
+      error,
       closePanel,
-      useSkill
-    }
-  },
-  watch: {
-    showToolsPanel(newVal) {
-      if (newVal) {
-        loadToolsAndSkills()
-      }
+      useSkill,
+      loadToolsAndSkills
     }
   }
 }
@@ -192,10 +199,14 @@ export default {
   color: var(--text-primary, #fff);
 }
 
-.loading, .empty {
+.loading, .empty, .error {
   color: var(--text-muted, #888);
   font-style: italic;
   padding: 10px;
+}
+
+.error {
+  color: #ef4444;
 }
 
 .tools-list {
