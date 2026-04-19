@@ -150,8 +150,11 @@ export default {
     }
 
     const sendMessage = async (message, options = {}) => {
-      const conv = conversations.find(c => c.id === currentConversationId.value)
-      if (!conv) return
+      let conv = conversations.find(c => c.id === currentConversationId.value)
+      if (!conv) {
+        startNewChat()
+        conv = conversations.find(c => c.id === currentConversationId.value)
+      }
 
       conv.messages.push({ role: 'user', content: message, timestamp: Date.now() })
 
