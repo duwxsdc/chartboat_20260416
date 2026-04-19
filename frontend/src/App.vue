@@ -272,7 +272,7 @@ export default {
           
           if (skill && skill.examplePrompt) {
             console.log('Skill found:', skill.name, 'Example prompt:', skill.examplePrompt)
-            handleFillInput(skill.examplePrompt)
+            chatWindowRef.value?.handleFillInput(skill.examplePrompt)
           } else {
             console.warn('Skill examplePrompt not found for skillId:', skillId)
           }
