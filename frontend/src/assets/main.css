@@ -8,7 +8,15 @@
   --primary-color: #10a37f;
   --primary-hover: #0d8c6d;
   --primary-light: rgba(16, 163, 127, 0.1);
+  --primary-dark: #0a7a61;
   --primary-gradient: linear-gradient(135deg, #10a37f, #34d399);
+  
+  --danger-color: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.1);
+  --warning-color: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  --success-color: #10b981;
+  --success-light: rgba(16, 185, 129, 0.1);
   
   --bg-dark: #212121;
   --bg-sidebar: #171717;

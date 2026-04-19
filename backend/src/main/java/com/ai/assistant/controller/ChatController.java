@@ -1,10 +1,12 @@
 package com.ai.assistant.controller;
 
-import com.ai.assistant.memory.ConversationBackupService;
-import com.ai.assistant.memory.TieredChatMemory;
 import com.ai.assistant.model.ChatRequest;
 import com.ai.assistant.model.ChatResponse;
+import com.ai.assistant.model.Conversation;
+import com.ai.assistant.model.Message;
+import com.ai.assistant.service.AuthService;
 import com.ai.assistant.service.ChatService;
+import com.ai.assistant.service.ConversationService;
 import com.ai.assistant.tool.SkillRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -25,22 +29,29 @@ public class ChatController {
 
     private final ChatService chatService;
     private final SkillRegistry skillRegistry;
-    private final TieredChatMemory tieredChatMemory;
-    private final ConversationBackupService backupService;
+    private final AuthService authService;
+    private final ConversationService conversationService;
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<ChatResponse>> streamChat(@RequestBody ChatRequest request) {
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            return Flux.error(new RuntimeException("User not authenticated"));
+        }
+
         String conversationId = request.getConversationId();
         if (conversationId == null || conversationId.isBlank()) {
             conversationId = chatService.getConversationId();
         }
 
-        log.info("Starting stream chat - Conversation: {}, Message: {}, Tools: {}, Skill: {}",
-                conversationId, request.getMessage(), request.isUseTools(), request.getFormat());
+        log.info("Starting stream chat - User: {}, Conversation: {}, Message: {}, Tools: {}, Skill: {}",
+                user.getUsername(), conversationId, request.getMessage(), request.isUseTools(), request.getFormat());
 
         final String finalConversationId = conversationId;
+        final Long userId = user.getId();
         
         return chatService.chatStream(
+                        userId,
                         finalConversationId,
                         request.getMessage(),
                         request.isUseTools(),
@@ -92,14 +103,20 @@ public class ChatController {
 
     @PostMapping(value = "/block")
     public ChatResponse blockChat(@RequestBody ChatRequest request) {
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
         String conversationId = request.getConversationId();
         if (conversationId == null || conversationId.isBlank()) {
             conversationId = chatService.getConversationId();
         }
 
-        log.info("Starting block chat - Conversation: {}, Message: {}", conversationId, request.getMessage());
+        log.info("Starting block chat - User: {}, Conversation: {}, Message: {}", user.getUsername(), conversationId, request.getMessage());
 
         String response = chatService.chatBlock(
+                user.getId(),
                 conversationId,
                 request.getMessage(),
                 request.isUseTools(),
@@ -117,7 +134,12 @@ public class ChatController {
 
     @DeleteMapping("/conversation/{conversationId}")
     public Map<String, String> clearConversation(@PathVariable String conversationId) {
-        chatService.clearConversation(conversationId);
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        chatService.clearConversation(user.getId(), conversationId);
         return Map.of("status", "success", "message", "Conversation cleared");
     }
 
@@ -131,28 +153,87 @@ public class ChatController {
         return Map.of("status", "ok", "timestamp", Instant.now().toString());
     }
 
-    @GetMapping("/conversation/{conversationId}/stats")
-    public Map<String, Object> getConversationStats(@PathVariable String conversationId) {
-        return tieredChatMemory.getConversationStats(conversationId);
-    }
+    @GetMapping("/conversations")
+    public Map<String, Object> getConversations() {
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
 
-    @PostMapping("/conversation/{conversationId}/rollback")
-    public Map<String, Object> rollbackConversation(@PathVariable String conversationId) {
-        boolean success = tieredChatMemory.rollback(conversationId);
+        List<Conversation> conversations = conversationService.getConversationsByUserId(user.getId());
+        var conversationList = conversations.stream()
+                .map(conv -> Map.of(
+                        "id", conv.getConversationId(),
+                        "title", conv.getTitle(),
+                        "createdAt", conv.getCreatedAt(),
+                        "updatedAt", conv.getUpdatedAt()
+                ))
+                .collect(Collectors.toList());
+
         return Map.of(
-                "status", success ? "success" : "failed",
-                "message", success ? "Rollback completed" : "Rollback failed - no backup found"
+                "status", "success",
+                "conversations", conversationList
         );
     }
 
-    @GetMapping("/conversation/{conversationId}/backups")
-    public Map<String, Object> getBackupStats(@PathVariable String conversationId) {
-        return backupService.getBackupStats(conversationId);
+    @GetMapping("/conversation/{conversationId}")
+    public Map<String, Object> getConversation(@PathVariable String conversationId) {
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        var conversation = conversationService.getConversationByUserIdAndConversationId(user.getId(), conversationId);
+        if (conversation.isEmpty()) {
+            throw new RuntimeException("Conversation not found");
+        }
+
+        var conv = conversation.get();
+        var messages = conversationService.getMessagesByConversationId(conv.getId());
+        var messageList = messages.stream()
+                .map(msg -> Map.of(
+                        "id", msg.getId(),
+                        "role", msg.getRole(),
+                        "content", msg.getContent(),
+                        "createdAt", msg.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        return Map.of(
+                "status", "success",
+                "conversation", Map.of(
+                        "id", conv.getConversationId(),
+                        "title", conv.getTitle(),
+                        "createdAt", conv.getCreatedAt(),
+                        "updatedAt", conv.getUpdatedAt(),
+                        "messages", messageList
+                )
+        );
     }
 
-    @DeleteMapping("/conversation/{conversationId}/backups")
-    public Map<String, String> deleteAllBackups(@PathVariable String conversationId) {
-        int count = backupService.deleteAllBackups(conversationId);
-        return Map.of("status", "success", "deletedCount", String.valueOf(count));
+    @PutMapping("/conversation/{conversationId}/title")
+    public Map<String, Object> updateConversationTitle(@PathVariable String conversationId, @RequestBody Map<String, String> request) {
+        var user = authService.getCurrentUser();
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        String title = request.get("title");
+        if (title == null || title.isBlank()) {
+            throw new RuntimeException("Title is required");
+        }
+
+        var updatedConversation = conversationService.updateConversationTitle(user.getId(), conversationId, title);
+        if (updatedConversation == null) {
+            throw new RuntimeException("Conversation not found");
+        }
+
+        return Map.of(
+                "status", "success",
+                "conversation", Map.of(
+                        "id", updatedConversation.getConversationId(),
+                        "title", updatedConversation.getTitle()
+                )
+        );
     }
 }

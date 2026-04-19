@@ -6,10 +6,10 @@
         <h1>AI 智能助手</h1>
         <p>支持多轮对话、工具调用、格式化输出</p>
         <div class="suggestions">
-          <button class="suggestion-btn" @click="$emit('send', '你好，请介绍一下你自己')">👋 你好，请介绍一下你自己</button>
-          <button class="suggestion-btn" @click="$emit('send', '帮我写一段Python快速排序代码')">💻 帮我写一段Python快速排序代码</button>
-          <button class="suggestion-btn" @click="$emit('send', '计算 256 * 128 + 1024')">🔢 计算 256 * 128 + 1024</button>
-          <button class="suggestion-btn" @click="$emit('send', '用表格形式列出太阳系八大行星')">🪐 用表格形式列出太阳系八大行星</button>
+          <button class="suggestion-btn" @click="$emit('fill-input', '你好，请介绍一下你自己')">👋 你好，请介绍一下你自己</button>
+          <button class="suggestion-btn" @click="$emit('fill-input', '帮我写一段Python快速排序代码')">💻 帮我写一段Python快速排序代码</button>
+          <button class="suggestion-btn" @click="$emit('fill-input', '计算 256 * 128 + 1024')">🔢 计算 256 * 128 + 1024</button>
+          <button class="suggestion-btn" @click="$emit('fill-input', '用表格形式列出太阳系八大行星')">🪐 用表格形式列出太阳系八大行星</button>
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@ export default {
     messages: { type: Array, required: true },
     isStreaming: { type: Boolean, default: false }
   },
-  emits: ['send'],
+  emits: ['send', 'fill-input'],
   setup(props) {
     const messageListRef = ref(null)
 

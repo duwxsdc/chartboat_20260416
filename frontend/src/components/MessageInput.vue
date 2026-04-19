@@ -7,7 +7,7 @@
           v-model="message"
           class="message-textarea"
           placeholder="输入消息... (Enter发送, Shift+Enter换行)"
-          :disabled="isStreaming"
+          :disabled="isLoading"
           @keydown="handleKeydown"
           rows="1"
         ></textarea>
@@ -15,9 +15,9 @@
       <button 
         type="submit" 
         class="send-btn"
-        :disabled="!message.trim() || isStreaming"
+        :disabled="!message.trim() || isLoading"
       >
-        <svg v-if="!isStreaming" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg v-if="!isLoading" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 
 export default {
   name: 'MessageInput',
@@ -47,11 +47,24 @@ export default {
   setup(props, { emit }) {
     const message = ref('')
     const textareaRef = ref(null)
+    const isLoading = ref(false)
+
+    // 监听isStreaming变化
+    watch(() => props.isStreaming, (newValue) => {
+      isLoading.value = newValue
+      console.log('isStreaming changed:', newValue, 'isLoading:', isLoading.value)
+    }, { immediate: true })
 
     const handleSend = () => {
-      if (message.value.trim() && !props.isStreaming) {
-        emit('send', message.value.trim())
+      if (message.value.trim() && !isLoading.value) {
+        const messageToSend = message.value.trim()
         message.value = ''
+        
+        // 这里应该由父组件控制isStreaming状态
+        // 我们只需要发送消息
+        console.log('Sending message:', messageToSend)
+        emit('send', messageToSend)
+        
         nextTick(() => {
           if (textareaRef.value) {
             textareaRef.value.style.height = 'auto'
@@ -74,12 +87,24 @@ export default {
       }
     }
 
+    const fillInput = (text) => {
+      message.value = text
+      nextTick(() => {
+        autoResize()
+        if (textareaRef.value) {
+          textareaRef.value.focus()
+        }
+      })
+    }
+
     return {
       message,
       textareaRef,
+      isLoading,
       handleSend,
       handleKeydown,
-      autoResize
+      autoResize,
+      fillInput
     }
   }
 }

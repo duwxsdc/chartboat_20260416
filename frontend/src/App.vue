@@ -1,11 +1,16 @@
 <template>
-  <div class="app-container">
+  <div v-if="!isAuthenticated" class="app-container">
+    <AuthPage @auth-success="handleAuthSuccess" />
+  </div>
+  <div v-else class="app-container">
     <Sidebar
       :conversations="conversations"
       :current-conversation-id="currentConversationId"
       @new-chat="startNewChat"
       @select-conversation="selectConversation"
       @delete-conversation="deleteConversation"
+      @logout="handleLogout"
+      :user="user"
     />
     <main class="chat-main">
       <ChatWindow
@@ -20,24 +25,66 @@
 </template>
 
 <script>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import ChatWindow from './components/ChatWindow.vue'
+import AuthPage from './components/AuthPage.vue'
 
 export default {
   name: 'App',
-  components: { Sidebar, ChatWindow },
+  components: { Sidebar, ChatWindow, AuthPage },
   setup() {
-    const conversations = reactive([
-      { id: 'default', title: '新对话', messages: [] }
-    ])
-    const currentConversationId = ref('default')
+    const isAuthenticated = ref(false)
+    const user = ref(null)
+    const conversations = reactive([])
+    const currentConversationId = ref('')
     const isStreaming = ref(false)
+    const loading = ref(false)
 
     const currentMessages = computed(() => {
       const conv = conversations.find(c => c.id === currentConversationId.value)
       return conv ? conv.messages : []
     })
+
+    const loadConversations = async () => {
+      try {
+        const response = await fetch('/api/chat/conversations', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          conversations.splice(0, conversations.length, ...data.conversations.map(conv => ({
+            id: conv.id,
+            title: conv.title,
+            messages: [],
+            createdAt: conv.createdAt
+          })))
+          if (conversations.length > 0 && !currentConversationId.value) {
+            currentConversationId.value = conversations[0].id
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load conversations:', error)
+      }
+    }
+
+    const handleAuthSuccess = (authData) => {
+      isAuthenticated.value = true
+      user.value = authData.user
+      loadConversations()
+    }
+
+    const handleLogout = () => {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      isAuthenticated.value = false
+      user.value = null
+      conversations.length = 0
+      currentConversationId.value = ''
+    }
 
     const startNewChat = () => {
       const newId = 'conv_' + Date.now()
@@ -45,13 +92,49 @@ export default {
       currentConversationId.value = newId
     }
 
-    const selectConversation = (id) => { currentConversationId.value = id }
+    const selectConversation = async (id) => {
+      currentConversationId.value = id
+      try {
+        const response = await fetch(`/api/chat/conversation/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          const conv = conversations.find(c => c.id === id)
+          if (conv) {
+            conv.messages = data.conversation.messages.map(msg => ({
+              role: msg.role,
+              content: msg.content,
+              timestamp: new Date(msg.createdAt).getTime()
+            }))
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load conversation:', error)
+      }
+    }
 
-    const deleteConversation = (id) => {
-      const idx = conversations.findIndex(c => c.id === id)
-      if (idx > -1) conversations.splice(idx, 1)
-      if (currentConversationId.value === id) {
-        currentConversationId.value = conversations[0]?.id || 'default'
+    const deleteConversation = async (id) => {
+      try {
+        const response = await fetch(`/api/chat/conversation/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const idx = conversations.findIndex(c => c.id === id)
+          if (idx > -1) conversations.splice(idx, 1)
+          if (currentConversationId.value === id) {
+            currentConversationId.value = conversations[0]?.id || ''
+          }
+        }
+      } catch (error) {
+        console.error('Failed to delete conversation:', error)
       }
     }
 
@@ -67,15 +150,16 @@ export default {
 
       isStreaming.value = true
 
-      // push空消息，再通过数组索引获取reactive Proxy引用
       conv.messages.push({ role: 'assistant', content: '', timestamp: Date.now(), isStreaming: true })
-      // 关键：必须从reactive数组中取回Proxy对象，否则后续修改不触发视图更新
       const assistantMsg = conv.messages[conv.messages.length - 1]
 
       try {
         const response = await fetch('/api/chat/stream', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
           body: JSON.stringify({
             conversationId: currentConversationId.value,
             message: message,
@@ -103,7 +187,12 @@ export default {
             if (!trimmed.startsWith('data:')) continue
             const colonIdx = trimmed.indexOf(':')
             const dataStr = trimmed.substring(colonIdx + 1).trim()
-            if (!dataStr || dataStr === '[DONE]') continue
+            if (!dataStr) continue
+            if (dataStr === '[DONE]') {
+              assistantMsg.isStreaming = false
+              isStreaming.value = false
+              continue
+            }
 
             try {
               const data = JSON.parse(dataStr)
@@ -112,6 +201,7 @@ export default {
               }
               if (data.done === true) {
                 assistantMsg.isStreaming = false
+                isStreaming.value = false
               }
             } catch (e) {
               console.warn('Parse error:', e)
@@ -119,23 +209,68 @@ export default {
           }
         }
 
+        // 确保最终状态更新
         assistantMsg.isStreaming = false
+        isStreaming.value = false
       } catch (error) {
+        console.error('Error in sendMessage:', error)
         assistantMsg.content = 'Error: ' + error.message
         assistantMsg.isStreaming = false
-      } finally {
         isStreaming.value = false
+      } finally {
+        // 最终确保状态重置
+        isStreaming.value = false
+        assistantMsg.isStreaming = false
+        console.log('sendMessage completed, isStreaming:', isStreaming.value)
       }
     }
 
     const clearConversation = async () => {
-      const conv = conversations.find(c => c.id === currentConversationId.value)
-      if (conv) { conv.messages = []; conv.title = '新对话' }
+      try {
+        const response = await fetch(`/api/chat/conversation/${currentConversationId.value}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const conv = conversations.find(c => c.id === currentConversationId.value)
+          if (conv) {
+            conv.messages = []
+            conv.title = '新对话'
+          }
+        }
+      } catch (error) {
+        console.error('Failed to clear conversation:', error)
+      }
     }
 
+    onMounted(() => {
+      const token = localStorage.getItem('token')
+      const userStr = localStorage.getItem('user')
+      if (token && userStr) {
+        isAuthenticated.value = true
+        user.value = JSON.parse(userStr)
+        loadConversations()
+      }
+    })
+
     return {
-      conversations, currentConversationId, currentMessages, isStreaming,
-      startNewChat, selectConversation, deleteConversation, sendMessage, clearConversation
+      isAuthenticated,
+      user,
+      conversations,
+      currentConversationId,
+      currentMessages,
+      isStreaming,
+      loading,
+      handleAuthSuccess,
+      handleLogout,
+      startNewChat,
+      selectConversation,
+      deleteConversation,
+      sendMessage,
+      clearConversation
     }
   }
 }

@@ -5,13 +5,16 @@
 
 ## 功能特性
 
+- **用户认证系统**: 基于JWT的安全登录认证，支持用户隔离会话
+- **会话历史管理**: 实时捕获并保存用户与系统的所有交互内容，支持分页查看、搜索和筛选
 - **SSE 流式输出**: 实时流式响应，打字机效果
 - **多轮对话**: 内置会话记忆，支持上下文对话
 - **格式化输出**: 支持 Markdown、JSON、HTML、Table、Bullet List 等格式
 - **Tool 函数调用**: 内置计算、日期、搜索、汇率转换等工具
 - **Skill 技能系统**: 预定义代码审查、SQL专家、翻译等技能
 - **MCP 工具集成**: 支持 Model Context Protocol 工具调用
-- **Vue 前端**: 现代化暗色主题界面，实时流式交互
+- **RAG 增强检索**: 支持文档上传和知识库检索（暂时禁用，正在配置中）
+- **Vue 前端**: 现代化暗色主题界面，实时流式交互，预设文本填充功能
 
 ## 项目结构
 
@@ -31,38 +34,56 @@
 │   │   └── assets/            # 样式文件
 │   └── package.json
 ├── deploy.bat                  # 一键部署脚本
+├── stop.bat                    # 一键停止脚本
+├── stop-services.ps1           # PowerShell 停止脚本
+├── stop-services.sh            # Linux/macOS 停止脚本
 ├── run-backend.bat             # 后端运行脚本
 └── run-frontend.bat            # 前端运行脚本
 ```
 
 ## 快速开始
 
-### 方式一：一键部署
+### Windows 用户（推荐）
 
+**一键部署（启动前后端）：**
 ```bash
 deploy.bat
 ```
 
-### 方式二：分别启动
-
-**后端 (已配置通义千问):**
+**一键停止：**
 ```bash
-cd backend
-mvn spring-boot:run
+stop.bat
 ```
-后端服务: http://localhost:8080/api
 
-**前端:**
+### macOS / Linux 用户
+
+**停止服务：**
 ```bash
-cd frontend
-npm install
+chmod +x stop-services.sh
+./stop-services.sh
+```
+
+**分别启动：**
+```bash
+# 终端1：启动后端
+cd backend && mvn spring-boot:run
+
+# 终端2：启动前端
+cd frontend && npm install  # 首次需要安装依赖
 npm run dev
 ```
-前端界面: http://localhost:5173
 
-### 验证服务
+### 测试账号
 
-启动后访问: http://localhost:8080/api/chat/health
+系统内置默认测试账号：
+- 用户名: `test`
+- 密码: `test123`
+
+### 访问地址
+
+- 前端界面: http://localhost:5173 (或 5174)
+- 后端 API: http://localhost:8080/api
+- 健康检查: http://localhost:8080/api/chat/health
 
 ## 配置说明
 
@@ -121,11 +142,51 @@ model: deepseek-ai/DeepSeek-V3
 
 ## API 接口
 
+### 用户认证
+
+#### 登录
+
+```
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test123"
+}
+```
+
+返回：
+```json
+{
+  "token": "JWT令牌",
+  "user": {
+    "id": 1,
+    "username": "test",
+    "email": "test@example.com"
+  }
+}
+```
+
+#### 注册
+
+```
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "新用户名",
+  "password": "密码",
+  "email": "邮箱"
+}
+```
+
 ### SSE 流式对话
 
 ```
 POST /api/chat/stream
 Content-Type: application/json
+Authorization: Bearer {token}
 
 {
   "conversationId": "可选，用于多轮对话",
@@ -140,6 +201,7 @@ Content-Type: application/json
 ```
 POST /api/chat/block
 Content-Type: application/json
+Authorization: Bearer {token}
 
 {
   "conversationId": "可选",
@@ -153,12 +215,41 @@ Content-Type: application/json
 
 ```
 DELETE /api/chat/conversation/{conversationId}
+Authorization: Bearer {token}
 ```
 
 ### 获取技能列表
 
 ```
 GET /api/chat/skills
+Authorization: Bearer {token}
+```
+
+### RAG 文档管理（暂时禁用）
+
+#### 批量上传文档
+
+```
+POST /api/rag/documents/batch
+Content-Type: multipart/form-data
+Authorization: Bearer {token}
+
+# 表单数据
+files: [文件1, 文件2, ...]
+```
+
+#### 获取已上传文档
+
+```
+GET /api/rag/documents
+Authorization: Bearer {token}
+```
+
+#### 删除文档
+
+```
+DELETE /api/rag/documents/{documentId}
+Authorization: Bearer {token}
 ```
 
 ## 内置工具

@@ -28,11 +28,13 @@
       :messages="messages" 
       :is-streaming="isStreaming"
       @send="handleSendFromList"
+      @fill-input="handleFillInput"
     />
 
     <MessageInput 
       :is-streaming="isStreaming"
       @send="handleSend"
+      ref="messageInputRef"
     />
   </div>
 </template>
@@ -54,6 +56,7 @@ export default {
   setup(props, { emit }) {
     const selectedFormat = ref('markdown')
     const useTools = ref(false)
+    const messageInputRef = ref(null)
 
     const handleSend = (message) => {
       emit('send-message', message, {
@@ -67,7 +70,14 @@ export default {
       handleSend(message)
     }
 
-    return { selectedFormat, useTools, handleSend, handleSendFromList }
+    // 处理填充输入框的事件
+    const handleFillInput = (message) => {
+      if (messageInputRef.value) {
+        messageInputRef.value.fillInput(message)
+      }
+    }
+
+    return { selectedFormat, useTools, handleSend, handleSendFromList, messageInputRef, handleFillInput }
   }
 }
 </script>
