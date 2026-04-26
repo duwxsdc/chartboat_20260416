@@ -36,7 +36,7 @@ spring:
     redis:
       host: ${REDIS_HOST:}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
+      password: ${REDIS_PASSWORD:!}
       timeout: 5000ms
       lettuce:
         pool:
@@ -82,9 +82,50 @@ cors:
   allowed-headers: "*"
   allow-credentials: true
 
+# 内容过滤配置
+content:
+  filter:
+    # 敏感词过滤
+    sensitive-word-enabled: true
+    sensitive-words:
+      - 政治敏感词
+      - 暴力词汇
+      - 色情词汇
+      - 违法词汇
+
+    # 闲聊拦截
+    chit-chat-enabled: true
+    chit-chat-patterns:
+      - "^你好$"
+      - "^在吗$"
+      - "^hi$"
+      - "^hello$"
+      - "^早上好"
+      - "^晚上好"
+      - "^今天天气"
+      - "^你叫什么名字"
+      - "^你是谁"
+      - "^你能做什么"
+      - "^你会什么"
+
+    # 无效输入检测
+    invalid-input-enabled: true
+    min-input-length: 2
+    max-input-length: 1000
+
+    # 闲聊回复
+    chit-chat:
+      greeting: "你好！我是AI助手，很高兴为您服务。请问有什么我可以帮您的吗？"
+      availability: "我在的！请问有什么可以帮助您的？"
+      identity: "我是AI智能助手，专门为您提供智能问答服务。"
+      capabilities: "我可以为您提供补录平台相关的问题解答，包括ITBA职责、操作流程、权限咨询等。请直接描述您的问题！"
+
 # 日志配置
 logging:
   level:
     root: INFO
     com.ai.assistant: DEBUG
     org.springframework.ai: INFO
+    com.ai.assistant.hook.CapabilityBoundaryHook: DEBUG
+    com.ai.assistant.hook.ContentFilterHook: DEBUG
+    com.ai.assistant.service.CapabilityBoundaryLogger: WARN
