@@ -5,20 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4e110335-3c72-4963-8ccc-2ec978e164d7" name="更改" comment="bugfix-流式接口前端响应">
-      <change beforePath="$PROJECT_DIR$/backend-error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend2.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend3.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend4.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/config/AiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/config/AiConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/config/ToolConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/config/ToolConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/controller/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/memory/TieredChatMemory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/memory/TieredChatMemory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/service/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/service/ChatService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/ai-assistant-1.0.0.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/frontend.log" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/frontend.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/components/ChatWindow.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/ChatWindow.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/components/MessageList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/MessageList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/components/Sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/Sidebar.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -50,18 +62,34 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven.ai-assistant [clean].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "dev",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "feature__rag",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/java/AI/20260416/backend",
+    "last_opened_file_path": "E:/java/AI/chart_boat_2026/chartboat_20260416/backend/src/main/resources/skills",
     "project.structure.last.edited": "SDK",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "应用程序.AiAssistantApplication.executor": "Run"
+    "settings.editor.selected.configurable": "preferences.customizations",
+    "应用程序.AiAssistantApplication.executor": "Debug"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\java\AI\chart_boat_2026\chartboat_20260416\backend\src\main\resources\skills" />
+      <recent name="E:\java\AI\chart_boat_2026\chartboat_20260416\backend\src\main\resources\skills\calc-skill" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\java\AI\chart_boat_2026\chartboat_20260416\backend\src\main\resources\skills" />
+      <recent name="E:\java\AI\chart_boat_2026\chartboat_20260416\backend\src\main\resources\skills\itba-skill" />
+      <recent name="E:\java\AI\chart_boat_2026\chartboat_20260416\backend\src\main\resources\skills\time-skill" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.ai.assistant.service" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="AiAssistantApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.ai.assistant.AiAssistantApplication" />
@@ -152,5 +180,86 @@
     <MESSAGE value="11" />
     <MESSAGE value="bugfix-流式接口前端响应" />
     <option name="LAST_COMMIT_MESSAGE" value="bugfix-流式接口前端响应" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/service/ReactAgentService.java</url>
+          <line>190</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/service/ReactAgentService.java</url>
+          <line>179</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/ai/spring-ai-alibaba-graph-core/1.1.2.0/spring-ai-alibaba-graph-core-1.1.2.0-sources.jar!/com/alibaba/cloud/ai/graph/skills/registry/classpath/ClasspathSkillRegistry.java</url>
+          <line>84</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/ai/spring-ai-alibaba-graph-core/1.1.2.0/spring-ai-alibaba-graph-core-1.1.2.0-sources.jar!/com/alibaba/cloud/ai/graph/skills/registry/classpath/ClasspathSkillRegistry.java</url>
+          <line>556</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/TimeSkillTool.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/CalcSkillTool.java</url>
+          <line>11</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java</url>
+          <line>52</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/AssistantTools.java</url>
+          <line>21</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/ItbaSkillTool.java</url>
+          <line>81</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/ItbaSkillTool.java</url>
+          <line>83</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/BusinessSkillTool.java</url>
+          <line>126</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ai/assistant/tool/BusinessSkillTool.java</url>
+          <line>128</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/ai/spring-ai-alibaba-agent-framework/1.1.2.0/spring-ai-alibaba-agent-framework-1.1.2.0-sources.jar!/com/alibaba/cloud/ai/graph/agent/ReactAgent.java</url>
+          <line>312</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

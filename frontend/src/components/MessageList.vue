@@ -3,7 +3,7 @@
     <div v-if="messages.length === 0" class="welcome-screen">
       <div class="welcome-content">
         <div class="welcome-icon">🤖</div>
-        <h1>AI 智能助手</h1>
+        <h1>AI 杜博容</h1>
         <p>支持多轮对话、工具调用、格式化输出</p>
         <div class="suggestions">
           <button class="suggestion-btn" @click="$emit('fill-input', '你好，请介绍一下你自己')">👋 你好，请介绍一下你自己</button>

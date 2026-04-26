@@ -1,4 +1,4 @@
-# AI 智能助手系统
+# AI 杜博容系统
 
 基于 Spring AI 1.0.0-M6 和 Spring Boot 3.4.1 构建的智能问答助手系统。
 已配置通义千问 (阿里云DashScope) 作为默认模型。

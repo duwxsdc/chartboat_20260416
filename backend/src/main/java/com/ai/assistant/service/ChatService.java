@@ -1,5 +1,6 @@
 package com.ai.assistant.service;
 
+import com.ai.assistant.model.ChatResponse;
 import com.ai.assistant.tool.SkillRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -18,7 +19,8 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class ChatService {
-
+    @Autowired
+    private ReactAgentService reactAgentService;
     private final ChatModel chatModel;
     private final ChatMemory chatMemory;
     private final SkillRegistry skillRegistry;
@@ -26,8 +28,8 @@ public class ChatService {
     private ToolCallback[] toolCallbacks;
 
     @Autowired
-    public ChatService(ChatModel chatModel, ChatMemory chatMemory, 
-                      SkillRegistry skillRegistry, ConversationService conversationService) {
+    public ChatService(ChatModel chatModel, ChatMemory chatMemory,
+                       SkillRegistry skillRegistry, ConversationService conversationService) {
         this.chatModel = chatModel;
         this.chatMemory = chatMemory;
         this.skillRegistry = skillRegistry;
@@ -39,60 +41,18 @@ public class ChatService {
         this.toolCallbacks = toolCallbacks;
     }
 
-    private static final String SYSTEM_PROMPT = "你是一个helpful的中文AI助手。请用中文回复用户的问题。" +
-            "当需要展示数学计算时，请使用简单易读的格式，不要使用LaTeX或数学公式符号（如\\times、\\frac等）。" +
-            "对于算术计算，请直接使用标准运算符（*、/、+、-）和清晰的步骤说明，让所有人都能轻松理解。";
 
-    public Flux<String> chatStream(Long userId, String conversationId, String message, boolean useTools, String skillId, String format) {
+    public Flux<String> chatStream(Long userId, String conversationId, String message) {
         String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
         String userConversationId = userId + ":" + convId;
 
-        saveUserMessage(userId, convId, message);
-
-        ChatClient.Builder builder = ChatClient.builder(chatModel);
-
-        String systemPrompt = SYSTEM_PROMPT;
-
-        if (skillId != null && skillRegistry.hasSkill(skillId)) {
-            SkillRegistry.Skill skill = skillRegistry.getSkill(skillId);
-            systemPrompt = skill.systemPrompt();
-            log.info("Using skill: {}", skillId);
-        }
-
-        if (format != null && !format.isBlank()) {
-            systemPrompt += " " + buildFormatPrompt(format);
-        }
-
-        builder.defaultSystem(systemPrompt);
-
-        ChatClient chatClient = builder.build();
-
-        StringBuilder fullResponse = new StringBuilder();
-
-        ChatClient.ChatClientRequestSpec requestSpec = chatClient.prompt()
-                .user(message)
-                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(userConversationId).build());
-
-        if (useTools && toolCallbacks != null && toolCallbacks.length > 0) {
-            log.info("Enabling {} tools for this request", toolCallbacks.length);
-            requestSpec.tools(toolCallbacks);
-        }
-
-        return requestSpec.stream()
-                .content()
-                .doOnNext(content -> {
-                    log.debug("Stream chunk: {}", content);
-                    fullResponse.append(content);
-                })
-                .doOnComplete(() -> {
-                    log.info("Stream completed for user: {}, conversation: {}", userId, convId);
-                    saveAssistantMessage(userId, convId, fullResponse.toString());
-                })
-                .doOnError(error -> {
-                    log.error("Stream error: {}", error.getMessage());
-                    saveAssistantMessage(userId, convId, "Error: " + error.getMessage());
-                });
+        return reactAgentService.chatStream(message, userConversationId, userId+"");
     }
+
+
+    private static final String SYSTEM_PROMPT = "你是一个叫杜博容的小朋友，男，三年级，是个学霸。请用中文回复用户的问题。" +
+            "当需要展示数学计算时，请使用简单易读的格式，不要使用LaTeX或数学公式符号（如\\times、\\frac等）。" +
+            "对于算术计算，请直接使用标准运算符（*、/、+、-）和清晰的步骤说明，让所有人都能轻松理解。";
 
     public String chatBlock(Long userId, String conversationId, String message, boolean useTools, String skillId, String format) {
         String convId = conversationId != null ? conversationId : UUID.randomUUID().toString();
@@ -184,7 +144,6 @@ public class ChatService {
         if (toolCallbacks == null || toolCallbacks.length == 0) {
             return List.of();
         }
-        // 简化返回工具信息，不调用可能不存在的API
         return List.of(new ToolInfo("tools", toolCallbacks.length + " tools available"));
     }
 

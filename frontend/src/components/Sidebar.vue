@@ -63,7 +63,7 @@
         </button>
       </div>
       <div class="settings-info">
-        <span>AI 智能助手 v1.0</span>
+        <span>AI 杜博容 v1.0</span>
       </div>
     </div>
     

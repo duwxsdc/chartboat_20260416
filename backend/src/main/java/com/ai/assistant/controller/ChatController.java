@@ -48,14 +48,11 @@ public class ChatController {
 
         final String finalConversationId = conversationId;
         final Long userId = user.getId();
-        
+
         return chatService.chatStream(
                         userId,
                         finalConversationId,
-                        request.getMessage(),
-                        request.isUseTools(),
-                        null,
-                        request.getFormat())
+                        request.getMessage())
                 .map(chunk -> {
                     ChatResponse response = ChatResponse.builder()
                             .conversationId(finalConversationId)

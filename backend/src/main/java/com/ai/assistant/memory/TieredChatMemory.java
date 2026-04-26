@@ -115,18 +115,14 @@ public class TieredChatMemory implements ChatMemory {
     }
 
     @Override
-    public List<Message> get(String conversationId, int lastN) {
+    public List<Message> get(String conversationId) {
         ReentrantLock lock = conversationLocks.computeIfAbsent(conversationId, k -> new ReentrantLock());
         lock.lock();
         try {
             List<Message> allMessages = getOrLoadMessages(conversationId);
             updateLastAccessTime(conversationId);
 
-            if (lastN <= 0 || lastN >= allMessages.size()) {
-                return new ArrayList<>(allMessages);
-            }
-
-            return new ArrayList<>(allMessages.subList(allMessages.size() - lastN, allMessages.size()));
+            return allMessages;
         } finally {
             lock.unlock();
         }

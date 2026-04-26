@@ -19,7 +19,13 @@ spring:
           model: ${CHAT_MODEL:}
           temperature: 0.7
           max-tokens: 4096
-
+    dashscope:
+      api-key:
+      # DashScope 基础URL (注意：不要带 /v1 后缀)
+      chat:
+        model:
+        temperature: 0.7
+        max-tokens: 4096
   # 对话记忆配置
   conversation:
     max-history: 20
@@ -28,9 +34,9 @@ spring:
   # Redis 配置
   data:
     redis:
-      host: ${REDIS_HOST:47.97.124.176}
+      host: ${REDIS_HOST:}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:redis2026!}
+      password: ${REDIS_PASSWORD:}
       timeout: 5000ms
       lettuce:
         pool:
@@ -40,7 +46,7 @@ spring:
 
 # JWT配置
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLong2026}
+  secret: ${JWT_SECRET:}
   expiration: 86400000  # 24小时（毫秒）
 
 # 上下文管理配置
@@ -63,7 +69,7 @@ context:
     summary:
       enabled: true
       max-messages-before-summary: 100
-      summary-model: 
+      summary-model: qwen-max
     # 监控配置
     monitor:
       enabled: true

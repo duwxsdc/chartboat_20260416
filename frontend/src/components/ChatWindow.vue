@@ -1,7 +1,7 @@
 <template>
   <div class="chat-window">
     <header class="chat-header">
-      <h2>AI 智能助手</h2>
+      <h2>AI 杜博容</h2>
       <div class="header-actions">
         <button class="tools-btn" @click="$emit('open-tools-panel')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
