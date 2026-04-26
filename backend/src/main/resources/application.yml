@@ -120,6 +120,13 @@ content:
       identity: "我是AI智能助手，专门为您提供智能问答服务。"
       capabilities: "我可以为您提供补录平台相关的问题解答，包括ITBA职责、操作流程、权限咨询等。请直接描述您的问题！"
 
+# Graph 检查点配置
+graph:
+  checkpoint:
+    saver:
+      # 保存器类型：memory（测试，默认）或 redis（生产）
+      type: ${CHECKPOINT_SAVER_TYPE:memory}
+
 # 日志配置
 logging:
   level:
@@ -129,3 +136,4 @@ logging:
     com.ai.assistant.hook.CapabilityBoundaryHook: DEBUG
     com.ai.assistant.hook.ContentFilterHook: DEBUG
     com.ai.assistant.service.CapabilityBoundaryLogger: WARN
+    com.ai.assistant.config.AiConfig: INFO

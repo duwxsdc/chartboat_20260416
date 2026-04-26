@@ -7,19 +7,28 @@ import com.ai.assistant.tool.*;
 import com.alibaba.cloud.ai.graph.agent.ReactAgent;
 import com.alibaba.cloud.ai.graph.agent.hook.skills.SkillsAgentHook;
 import com.alibaba.cloud.ai.graph.agent.interceptor.toolselection.ToolSelectionInterceptor;
+import com.alibaba.cloud.ai.graph.checkpoint.BaseCheckpointSaver;
 import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
+import com.alibaba.cloud.ai.graph.checkpoint.savers.redis.RedisSaver;
 import com.alibaba.cloud.ai.graph.skills.registry.classpath.ClasspathSkillRegistry;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 public class AiConfig {
 
@@ -28,6 +37,15 @@ public class AiConfig {
 
     @Autowired
     private ContentFilterHook contentFilterHook;
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
+
+    @Value("${spring.data.redis.password:}")
+    private String redisPassword;
 
     @Bean
     public ChatMemory chatMemory(TieredChatMemory tieredChatMemory) {
@@ -40,17 +58,46 @@ public class AiConfig {
     }
 
     @Bean
-    public ReactAgent createReactAgent(ChatModel chatModel,ItbaSkillTool itbaSkillTool,BusinessSkillTool businessSkillTool) {
+    @ConditionalOnProperty(name = "graph.checkpoint.saver.type", havingValue = "memory", matchIfMissing = true)
+    public BaseCheckpointSaver memorySaver() {
+        log.info("Creating MemorySaver (TEST mode)");
+        return new MemorySaver();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "graph.checkpoint.saver.type", havingValue = "redis")
+    public BaseCheckpointSaver redisSaver() {
+        log.info("Creating RedisSaver (PROD mode): {}:{}", redisHost, redisPort);
+
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress(String.format("redis://%s:%d", redisHost, redisPort));
+
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            config.useSingleServer().setPassword(redisPassword);
+        }
+
+        RedissonClient redisson = Redisson.create(config);
+        return RedisSaver.builder().redisson(redisson).build();
+    }
+
+    @Bean
+    public ReactAgent createReactAgent(ChatModel chatModel, ItbaSkillTool itbaSkillTool,
+                                       BusinessSkillTool businessSkillTool,
+                                       BaseCheckpointSaver checkpointSaver) {
+
+        log.info("Creating ReactAgent with {}", checkpointSaver.getClass().getSimpleName());
+
         return ReactAgent.builder()
                 .name("react_chat_agent")
                 .model(chatModel)
                 .systemPrompt("你是一个有用的AI助手")
                 .tools(getToolCallbacks())
-                .hooks(contentFilterHook, skillsAgentHook(itbaSkillTool,businessSkillTool), capabilityBoundaryHook)
+                .hooks(contentFilterHook, skillsAgentHook(itbaSkillTool, businessSkillTool), capabilityBoundaryHook)
                 .interceptors(ToolSelectionInterceptor.builder().selectionModel(chatModel).maxTools(5).build())
                 .maxParallelTools(3)
                 .returnReasoningContents(true)
-                .saver(new MemorySaver())
+                .saver(checkpointSaver)
                 .enableLogging(true)
                 .build();
     }
@@ -67,7 +114,7 @@ public class AiConfig {
     }
 
     @Bean
-    public SkillsAgentHook skillsAgentHook(ItbaSkillTool itbaSkillTool,BusinessSkillTool businessSkillTool) {
+    public SkillsAgentHook skillsAgentHook(ItbaSkillTool itbaSkillTool, BusinessSkillTool businessSkillTool) {
         MethodToolCallbackProvider tool1 = MethodToolCallbackProvider.builder()
                 .toolObjects(new TimeSkillTool()).build();
         MethodToolCallbackProvider tool2 = MethodToolCallbackProvider.builder()
@@ -81,7 +128,7 @@ public class AiConfig {
                 "time-skill", List.of(tool1.getToolCallbacks()),
                 "calc-skill", List.of(tool2.getToolCallbacks()),
                 "itba-skill", List.of(tool3.getToolCallbacks()),
-                "business-skill",List.of(tool.getToolCallbacks())
+                "business-skill", List.of(tool.getToolCallbacks())
         );
 
         return SkillsAgentHook.builder()
